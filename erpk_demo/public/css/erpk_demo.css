@@ -1,1 +1,50 @@
-/* ERP Kenya demo styles */
+/* ERP Kenya demo: brand colours and the persistent demo banner */
+:root {
+	--erpk-navy: #152d5d;
+	--erpk-blue: #006efb;
+	--erpk-green: #109a67;
+}
+
+#erpk-demo-banner {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1030;
+	height: 26px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	background: var(--erpk-navy);
+	color: #fff;
+	font-size: 12px;
+	letter-spacing: 0.01em;
+	pointer-events: auto;
+}
+
+#erpk-demo-banner a {
+	color: #fff;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+#erpk-demo-banner .erpk-demo-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--erpk-green);
+}
+
+body.erpk-demo {
+	padding-bottom: 26px;
+}
+
+@media print {
+	#erpk-demo-banner {
+		display: none;
+	}
+	body.erpk-demo {
+		padding-bottom: 0;
+	}
+}

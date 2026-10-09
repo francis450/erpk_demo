@@ -48,3 +48,43 @@ def fill_quotation_costs(doc):
 		for row in doc.items:
 			row.db_update()
 		doc.db_update()
+
+
+def _company():
+	return frappe.defaults.get_user_default("Company") or frappe.db.get_single_value("Global Defaults", "default_company")
+
+
+@frappe.whitelist()
+def start_here() -> list[dict]:
+	"""The workspace's numbered walkthrough links, written by the seed for the default company."""
+	links = frappe.parse_json(frappe.db.get_default(f"start_here:{_company()}", parent="__erpk_demo") or "[]")
+	return [{"label": frappe._(link["label"]), "route": link["route"]} for link in links]
+
+
+@frappe.whitelist()
+def below_reorder_count(filters=None) -> dict:
+	"""Number card: raw materials whose projected qty is at or under their reorder level."""
+	frappe.has_permission("Bin", "read", throw=True)
+	rows = frappe.db.sql(
+		"""
+		select count(distinct r.parent)
+		from `tabItem Reorder` r
+		join `tabBin` b on b.item_code = r.parent and b.warehouse = r.warehouse
+		join `tabWarehouse` w on w.name = r.warehouse
+		where w.company = %s and b.projected_qty <= r.warehouse_reorder_level
+		""",
+		_company(),
+	)
+	return {"value": rows[0][0] if rows else 0, "fieldtype": "Int"}
+
+
+@frappe.whitelist()
+def utilisation_this_month(filters=None) -> dict:
+	"""Number card: wood utilisation % for the current month."""
+	from frappe.utils import get_first_day, today
+
+	from erpk_demo.erpk_demo.report.wood_utilisation.wood_utilisation import utilisation_by_month
+
+	frappe.has_permission("Stock Entry", "read", throw=True)
+	months = utilisation_by_month(_company(), get_first_day(today()), today())
+	return {"value": round(months[-1]["utilisation"], 1) if months else None, "fieldtype": "Percent"}

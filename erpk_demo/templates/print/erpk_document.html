@@ -1,0 +1,101 @@
+{#- ERP Kenya branded sales document. Included by the "ERPK Quotation" and "ERPK Sales Invoice"
+    print formats, which set `erpk_title`. Internal cost / margin fields are never shown. -#}
+{%- from "templates/print_formats/standard_macros.html" import add_header -%}
+{%- set company = frappe.get_cached_doc("Company", doc.company) -%}
+{%- set party = doc.customer_name or doc.party_name or doc.customer -%}
+<style>
+	.erpk-doc { font-size: 12px; color: #1f2733; }
+	.erpk-doc .erpk-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+	.erpk-doc .erpk-logo img { max-height: 64px; max-width: 220px; }
+	.erpk-doc .erpk-company { font-size: 18px; font-weight: 700; color: #152D5D; }
+	.erpk-doc .erpk-title { font-size: 20px; font-weight: 700; color: #152D5D; text-align: right; }
+	.erpk-doc .erpk-meta { text-align: right; color: #4b5563; line-height: 1.6; }
+	.erpk-doc .erpk-party { margin-bottom: 14px; line-height: 1.6; }
+	.erpk-doc table.erpk-items { width: 100%; border-collapse: collapse; }
+	.erpk-doc table.erpk-items th { background: #152D5D; color: #fff; padding: 7px 8px; text-align: left; font-weight: 600; }
+	.erpk-doc table.erpk-items th.num, .erpk-doc table.erpk-items td.num { text-align: right; }
+	.erpk-doc table.erpk-items td { padding: 7px 8px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+	.erpk-doc table.erpk-items tr:nth-child(even) td { background: #f6f8fb; }
+	.erpk-doc .erpk-totals { width: 45%; margin-left: auto; margin-top: 10px; border-collapse: collapse; }
+	.erpk-doc .erpk-totals td { padding: 5px 8px; }
+	.erpk-doc .erpk-totals tr.grand td { border-top: 2px solid #006EFB; font-weight: 700; font-size: 14px; color: #152D5D; }
+	.erpk-doc .erpk-words { margin-top: 6px; color: #4b5563; }
+	.erpk-doc .erpk-terms { margin-top: 18px; color: #4b5563; }
+	.erpk-doc .erpk-footer { margin-top: 28px; padding-top: 8px; border-top: 3px solid #109A67; color: #4b5563; font-size: 11px; display: flex; justify-content: space-between; }
+	.erpk-doc .erpk-footer strong { color: #152D5D; }
+</style>
+
+{{ add_header(0, 1, doc, letter_head, no_letterhead, footer, print_settings) }}
+
+<div class="erpk-doc">
+	<div class="erpk-head">
+		<div class="erpk-logo">
+			{%- if company.company_logo -%}
+			<img src="{{ company.company_logo }}" alt="{{ company.name }}">
+			{%- else -%}
+			<div class="erpk-company">{{ company.company_name }}</div>
+			{%- endif -%}
+		</div>
+		<div>
+			<div class="erpk-title">{{ _(erpk_title) }}</div>
+			<div class="erpk-meta">
+				{{ doc.name }}<br>
+				{{ _("Date") }}: {{ frappe.format(doc.transaction_date or doc.posting_date, {"fieldtype": "Date"}) }}<br>
+				{%- if doc.valid_till %}{{ _("Valid till") }}: {{ frappe.format(doc.valid_till, {"fieldtype": "Date"}) }}<br>{% endif -%}
+				{%- if doc.due_date and doc.doctype == "Sales Invoice" %}{{ _("Due") }}: {{ frappe.format(doc.due_date, {"fieldtype": "Date"}) }}{% endif -%}
+			</div>
+		</div>
+	</div>
+
+	<div class="erpk-party">
+		<strong>{{ _("To") }}:</strong> {{ party }}<br>
+		{%- if doc.address_display %}{{ doc.address_display }}{% endif -%}
+	</div>
+
+	<table class="erpk-items">
+		<thead>
+			<tr>
+				<th style="width: 4%">#</th>
+				<th>{{ _("Item") }}</th>
+				<th class="num" style="width: 10%">{{ _("Qty") }}</th>
+				<th class="num" style="width: 18%">{{ _("Rate") }}</th>
+				<th class="num" style="width: 18%">{{ _("Amount") }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{%- for row in doc.items %}
+			<tr>
+				<td>{{ row.idx }}</td>
+				<td><strong>{{ row.item_name }}</strong>{% if row.description and row.description != row.item_name %}<br><span style="color:#6b7280">{{ row.description }}</span>{% endif %}</td>
+				<td class="num">{{ row.get_formatted("qty") }} {{ row.uom }}</td>
+				<td class="num">{{ row.get_formatted("rate", doc) }}</td>
+				<td class="num">{{ row.get_formatted("amount", doc) }}</td>
+			</tr>
+			{%- endfor %}
+		</tbody>
+	</table>
+
+	<table class="erpk-totals">
+		<tr><td>{{ _("Net Total") }}</td><td class="num" style="text-align:right">{{ doc.get_formatted("net_total") }}</td></tr>
+		{%- if doc.discount_amount %}
+		<tr><td>{{ _("Discount") }}</td><td style="text-align:right">- {{ doc.get_formatted("discount_amount") }}</td></tr>
+		{%- endif %}
+		{%- for tax in doc.taxes %}{% if tax.tax_amount %}
+		<tr><td>{{ tax.description }}</td><td style="text-align:right">{{ tax.get_formatted("tax_amount", doc) }}</td></tr>
+		{%- endif %}{% endfor %}
+		<tr class="grand"><td>{{ _("Grand Total") }}</td><td style="text-align:right">{{ doc.get_formatted("rounded_total" if doc.rounded_total else "grand_total") }}</td></tr>
+		{%- if doc.doctype == "Sales Invoice" and doc.docstatus == 1 %}
+		<tr><td>{{ _("Outstanding") }}</td><td style="text-align:right">{{ doc.get_formatted("outstanding_amount") }}</td></tr>
+		{%- endif %}
+	</table>
+	{%- if doc.in_words %}<div class="erpk-words" style="text-align:right">{{ doc.in_words }}</div>{% endif %}
+
+	{%- if doc.terms %}
+	<div class="erpk-terms"><strong>{{ _("Terms") }}</strong><br>{{ doc.terms }}</div>
+	{%- endif %}
+
+	<div class="erpk-footer">
+		<span>{{ company.company_name }} · {{ _("Sample data") }}</span>
+		<span><strong>ERP Kenya</strong> · contact@erpkenya.com · +254 757 185189</span>
+	</div>
+</div>
