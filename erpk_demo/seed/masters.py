@@ -12,6 +12,7 @@ def run(ctx):
 	ensure_fiscal_years(ctx, add_days(today(), -(p.OPENING_DAYS_AGO + 60)))
 	configure_settings(ctx)
 	ensure_vat_template(ctx)
+	ensure_bank(ctx)
 
 	for uom in p.UOMS:
 		ensure_doc(ctx, "UOM", uom["uom_name"], uom)
@@ -50,6 +51,12 @@ def ensure_company(ctx):
 			},
 		)
 
+	if not frappe.db.get_value("Company", ctx.company, "default_operating_cost_account"):
+		# workstation costs absorbed into stock value
+		frappe.db.set_value(
+			"Company", ctx.company, "default_operating_cost_account", ctx.acc("Expenses Included In Valuation")
+		)
+
 	frappe.db.set_single_value("Global Defaults", "default_company", ctx.company)
 	frappe.db.set_default("company", ctx.company)
 	if not frappe.db.get_value("Company", ctx.company, "enable_perpetual_inventory"):
@@ -79,6 +86,12 @@ def ensure_fiscal_years(ctx, from_date):
 
 
 def configure_settings(ctx):
+	if not frappe.get_meta("Contact").has_field("is_billing_contact"):
+		# some v16 sites miss ERPNext's own Address/Contact fields; invoicing queries need them
+		from erpnext.setup.install import create_address_and_contact_custom_fields
+
+		create_address_and_contact_custom_fields()
+
 	stock = frappe.get_single("Stock Settings")
 	if stock.valuation_method != "Moving Average":
 		if frappe.db.exists("Stock Ledger Entry", {"is_cancelled": 0}):
@@ -86,7 +99,7 @@ def configure_settings(ctx):
 		else:
 			stock.valuation_method = "Moving Average"
 	stock.allow_negative_stock = 0
-	stock.auto_indent = 1
+	stock.auto_indent = 0  # the demo's shortage request is seeded as a draft; no scheduler duplicates
 	stock.reorder_email_notify = 0
 	stock.save()
 
@@ -138,6 +151,26 @@ def ensure_vat_template(ctx):
 			],
 		},
 	)
+
+
+def ensure_bank(ctx):
+	p = ctx.profile
+	parent = frappe.db.get_value("Account", {"company": ctx.company, "account_type": "Bank", "is_group": 1})
+	account = ensure_doc(
+		ctx,
+		"Account",
+		{"account_name": p.BANK_ACCOUNT, "company": ctx.company},
+		{"parent_account": parent, "account_type": "Bank", "account_currency": "KES"},
+	).name
+	for mode in p.MODES_OF_PAYMENT:
+		mop = ensure_doc(ctx, "Mode of Payment", mode, {"mode_of_payment": mode, "type": "Bank"})
+		if not any(a.company == ctx.company for a in mop.accounts):
+			mop.append("accounts", {"company": ctx.company, "default_account": account})
+			mop.save()
+
+
+def bank_account(ctx):
+	return frappe.db.get_value("Account", {"account_name": ctx.profile.BANK_ACCOUNT, "company": ctx.company})
 
 
 def vat_template(ctx):

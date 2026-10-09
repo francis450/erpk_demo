@@ -192,6 +192,7 @@ BESPOKE = {
 	"customer": "achieng",
 	"rate": 185000,
 	"utilisation": 79,
+	"over_issue": 1.02,  # timber issued vs the (already scaled) bespoke BOM
 	"deliver_from": "ngong",
 	"deposit_pct": 50,
 	"mode_of_payment": "Bank Transfer",
@@ -217,3 +218,7 @@ START_HERE = [
 	("See shortages before they reach the floor", "shortage_material_request"),
 	("Track wood utilisation against the 80% goal", "wood_utilisation"),
 ]
+
+# ── Banking (sample) ───────────────────────────────────────────────────────
+BANK_ACCOUNT = "Business Current Account (Demo)"
+MODES_OF_PAYMENT = ["Bank Transfer"]
