@@ -25,6 +25,11 @@ def run(ctx):
 	ensure_workstations(ctx)
 	ensure_boms(ctx)
 
+	# before any transaction, so seeded documents carry the plain company letter head
+	from erpk_demo.seed.ux import letter_head
+
+	letter_head(ctx)
+
 
 # ── Company & settings ──────────────────────────────────────────────────────
 

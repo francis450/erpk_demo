@@ -12,7 +12,8 @@ frappe.query_reports["Wood Utilisation"] = {
 			fieldname: "from_date",
 			label: __("From Date"),
 			fieldtype: "Date",
-			default: frappe.datetime.month_start(frappe.datetime.add_months(frappe.datetime.get_today(), -5)),
+			// first day of the month five months back (month_start() takes no argument)
+			default: frappe.datetime.add_months(frappe.datetime.get_today(), -5).slice(0, 8) + "01",
 			reqd: 1,
 		},
 		{

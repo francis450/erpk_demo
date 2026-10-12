@@ -39,10 +39,9 @@ def start_here_links(ctx):
 		"open_quotation": lambda: form("Quotation", lookup(ctx, "s4:quotation", "Quotation")),
 		"bespoke_sales_order": lambda: form("Sales Order", lookup(ctx, "s1:so", "Sales Order")),
 		"shortage_material_request": lambda: form("Material Request", lookup(ctx, "s3:mr", "Material Request")),
-		"stock_balance": lambda: (
-			"/desk/query-report/Stock Balance",
-			{"company": ctx.company, "from_date": str(get_first_day(today())), "to_date": today()},
-		),
+		# Stock Balance is a background (prepared) report in v16; this one runs instantly and
+		# shows actual, reserved and projected qty per warehouse
+		"stock_balance": lambda: ("/desk/query-report/Stock Projected Qty", {"company": ctx.company}),
 		"wood_utilisation": lambda: (
 			"/desk/query-report/Wood Utilisation",
 			{"company": ctx.company, "from_date": str(get_first_day(add_months(today(), -5))), "to_date": today()},

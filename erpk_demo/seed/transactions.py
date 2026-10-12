@@ -30,6 +30,22 @@ def capacity_planning_off():
 		frappe.db.set_single_value("Manufacturing Settings", "disable_capacity_planning", before)
 
 
+def process_reposts(ctx=None):
+	"""Run any queued item valuation reposts now. Demo sites keep the scheduler off, so
+	ERPNext's hourly job would never get to them and reports would warn about reposting."""
+	from erpnext.stock.doctype.repost_item_valuation.repost_item_valuation import (
+		execute_reposting_entry,
+		get_repost_item_valuation_entries,
+	)
+
+	entries = get_repost_item_valuation_entries()
+	for row in entries:
+		execute_reposting_entry(row.name)
+		frappe.db.commit()
+	if entries and ctx:
+		ctx.log(f"Processed {len(entries)} valuation reposts")
+
+
 # ── Registry ────────────────────────────────────────────────────────────────
 
 
@@ -167,6 +183,7 @@ def opening(ctx):
 			posting + datetime.timedelta(hours=1),
 		),
 	)
+	process_reposts(ctx)
 
 
 def unit_cost(item_code):
@@ -472,6 +489,7 @@ def history(ctx):
 	with capacity_planning_off():
 		run_steps(ctx, steps)
 	ctx.floor = floor
+	process_reposts(ctx)
 
 
 def buy_and_pay(ctx, key, sup_key, item_code, qty, dt):
@@ -504,6 +522,7 @@ def stories(ctx):
 	story_shortage(ctx)
 	frappe.db.commit()
 	story_open_quotation(ctx)
+	process_reposts(ctx)
 
 
 def replay_floor(ctx):

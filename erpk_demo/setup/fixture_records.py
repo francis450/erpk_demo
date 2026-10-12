@@ -16,6 +16,8 @@ MODULE = "ERPK Demo"
 WORKSPACE = "Workshop"
 START_HERE_BLOCK = "ERPK Start Here"
 CHART = "ERPK Wood Utilisation by Month"
+CHART_LABEL = "Wood utilisation by month"
+# Workspace content blocks find their widget by the row label, not the record name.
 
 DEMO_ROLES = [
 	"Sales User",
@@ -77,6 +79,8 @@ NUMBER_CARDS = [
 		"label": "Raw materials below reorder level",
 		"type": "Custom",
 		"method": "erpk_demo.api.below_reorder_count",
+		# v16 shows a Custom card only to users who can read its document_type
+		"document_type": "Bin",
 		"color": "#E24C4C",
 	},
 	{
@@ -84,6 +88,7 @@ NUMBER_CARDS = [
 		"label": "Wood utilisation this month (%)",
 		"type": "Custom",
 		"method": "erpk_demo.api.utilisation_this_month",
+		"document_type": "Stock Entry",
 		"color": "#109A67",
 	},
 	{
@@ -185,6 +190,7 @@ def custom_fields():
 			"fieldname": "erpk_margin_pct",
 			"label": "Est. Margin %",
 			"fieldtype": "Percent",
+			"precision": "1",
 			"insert_after": "erpk_unit_cost",
 			"read_only": 1,
 			"print_hide": 1,
@@ -224,6 +230,7 @@ def custom_fields():
 					"fieldname": "erpk_margin_pct",
 					"label": "Est. Margin %",
 					"fieldtype": "Percent",
+					"precision": "1",
 					"insert_after": "erpk_costing_cb",
 					"read_only": 1,
 					"print_hide": 1,
@@ -257,7 +264,12 @@ def start_here_block():
 def number_cards():
 	for card in NUMBER_CARDS:
 		values = {k: v for k, v in card.items() if k != "name"}
-		upsert("Number Card", card["name"], {**values, "module": MODULE, "is_public": 1, "is_standard": 0})
+		# no currency: the widget would format counts and percentages as money
+		upsert(
+			"Number Card",
+			card["name"],
+			{**values, "module": MODULE, "is_public": 1, "is_standard": 0, "currency": None},
+		)
 
 
 def chart():
@@ -278,7 +290,7 @@ def chart():
 			"dynamic_filters_json": json.dumps(
 				{
 					"company": 'frappe.defaults.get_user_default("Company")',
-					"from_date": "frappe.datetime.month_start(frappe.datetime.add_months(frappe.datetime.get_today(), -5))",
+					"from_date": "frappe.datetime.add_months(frappe.datetime.get_today(), -5).slice(0, 8) + '01'",
 					"to_date": "frappe.datetime.get_today()",
 				}
 			),
@@ -293,11 +305,11 @@ def workspace():
 		{"id": "erpkspace1", "type": "spacer", "data": {"col": 12}},
 	]
 	blocks += [
-		{"id": f"erpkcard{i}0", "type": "number_card", "data": {"number_card_name": c["name"], "col": 3}}
+		{"id": f"erpkcard{i}0", "type": "number_card", "data": {"number_card_name": c["label"], "col": 3}}
 		for i, c in enumerate(NUMBER_CARDS)
 	]
 	blocks += [
-		{"id": "erpkchart0", "type": "chart", "data": {"chart_name": CHART, "col": 12}},
+		{"id": "erpkchart0", "type": "chart", "data": {"chart_name": CHART_LABEL, "col": 12}},
 		{"id": "erpkhead01", "type": "header", "data": {"text": '<span class="h4"><b>Shortcuts</b></span>', "col": 12}},
 	]
 	blocks += [
@@ -316,7 +328,7 @@ def workspace():
 		"content": json.dumps(blocks),
 		"custom_blocks": [{"custom_block_name": START_HERE_BLOCK, "label": START_HERE_BLOCK}],
 		"number_cards": [{"number_card_name": c["name"], "label": c["label"]} for c in NUMBER_CARDS],
-		"charts": [{"chart_name": CHART, "label": "Wood utilisation by month"}],
+		"charts": [{"chart_name": CHART, "label": CHART_LABEL}],
 		"shortcuts": [
 			{"label": label, "link_to": label, "type": typ, "doc_view": view, "color": "Blue"}
 			for label, typ, view in SHORTCUTS

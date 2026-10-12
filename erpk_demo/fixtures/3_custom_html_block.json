@@ -3,7 +3,7 @@
   "docstatus": 0,
   "doctype": "Custom HTML Block",
   "html": "<div class=\"erpk-start\">\n\t<div class=\"erpk-start-head\">\n\t\t<span class=\"erpk-start-kicker\">Start here</span>\n\t\t<span class=\"erpk-start-sub\">Six short steps through the demo. Follow them in order.</span>\n\t</div>\n\t<ol class=\"erpk-start-list\"><li class=\"erpk-start-loading\">Loading…</li></ol>\n</div>",
-  "modified": "2026-10-12 11:04:56.758996",
+  "modified": "2026-10-12 11:37:51.000643",
   "name": "ERPK Start Here",
   "private": 0,
   "roles": [],

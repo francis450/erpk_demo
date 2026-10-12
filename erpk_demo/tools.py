@@ -2,6 +2,7 @@
 
     bench --site <site> execute erpk_demo.tools.harden
     bench --site <site> execute erpk_demo.tools.status
+    bench --site <site> execute erpk_demo.tools.process_reposts
 """
 
 import frappe
@@ -31,3 +32,11 @@ def status():
 	print(f"emails sent     {frappe.db.count('Email Queue', {'status': 'Sent'})}")
 	for dt in ("Work Order", "Sales Order", "Sales Invoice", "Quotation", "Material Request"):
 		print(f"{dt:<17} {frappe.db.count(dt, {'docstatus': ['<', 2]})}")
+
+
+def process_reposts():
+	"""Run queued item valuation reposts now (demo sites keep the scheduler off)."""
+	from erpk_demo.seed.transactions import process_reposts as run
+
+	run()
+	print("reposts processed")

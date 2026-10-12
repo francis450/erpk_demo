@@ -1,6 +1,5 @@
 {#- ERP Kenya branded sales document. Included by the "ERPK Quotation" and "ERPK Sales Invoice"
     print formats, which set `erpk_title`. Internal cost / margin fields are never shown. -#}
-{%- from "templates/print_formats/standard_macros.html" import add_header -%}
 {%- set company = frappe.get_cached_doc("Company", doc.company) -%}
 {%- set party = doc.customer_name or doc.party_name or doc.customer -%}
 <style>
@@ -9,6 +8,7 @@
 	.erpk-doc .erpk-logo img { max-height: 64px; max-width: 220px; }
 	.erpk-doc .erpk-company { font-size: 18px; font-weight: 700; color: #152D5D; }
 	.erpk-doc .erpk-title { font-size: 20px; font-weight: 700; color: #152D5D; text-align: right; }
+	.erpk-doc .erpk-draft { font-size: 11px; font-weight: 600; color: #b45309; border: 1px solid #f59e0b; border-radius: 4px; padding: 1px 6px; vertical-align: middle; }
 	.erpk-doc .erpk-meta { text-align: right; color: #4b5563; line-height: 1.6; }
 	.erpk-doc .erpk-party { margin-bottom: 14px; line-height: 1.6; }
 	.erpk-doc table.erpk-items { width: 100%; border-collapse: collapse; }
@@ -25,8 +25,8 @@
 	.erpk-doc .erpk-footer strong { color: #152D5D; }
 </style>
 
-{{ add_header(0, 1, doc, letter_head, no_letterhead, footer, print_settings) }}
-
+{#- The header below is the letter head for these formats, so the standard letter head and print
+    heading are not added on top of it. -#}
 <div class="erpk-doc">
 	<div class="erpk-head">
 		<div class="erpk-logo">
@@ -37,7 +37,7 @@
 			{%- endif -%}
 		</div>
 		<div>
-			<div class="erpk-title">{{ _(erpk_title) }}</div>
+			<div class="erpk-title">{{ _(erpk_title) }}{% if doc.docstatus == 0 %} <span class="erpk-draft">{{ _("Draft") }}</span>{% elif doc.docstatus == 2 %} <span class="erpk-draft">{{ _("Cancelled") }}</span>{% endif %}</div>
 			<div class="erpk-meta">
 				{{ doc.name }}<br>
 				{{ _("Date") }}: {{ frappe.format(doc.transaction_date or doc.posting_date, {"fieldtype": "Date"}) }}<br>

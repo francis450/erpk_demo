@@ -56,8 +56,24 @@ checked against the installed ERPNext/Frappe 16.50 source.
   ERPNext's `create_address_and_contact_custom_fields()`.
 - **Banner position.** The "Demo system by ERP Kenya" banner is a slim fixed bar at the bottom of the
   desk. It never overlaps the v16 navbar and is hidden in print.
-- **Stock Balance** is a prepared (background) report in v16. The first time someone opens it, a run is
-  queued, so a worker must be running.
+- **Walkthrough step 4 uses Stock Projected Qty, not Stock Balance.** Stock Balance is a background
+  (prepared) report in v16, so the prospect would land on "generate a new report". Stock Projected Qty
+  runs instantly and shows actual, reserved and projected qty per warehouse, including the fabric
+  shortage.
+- **Valuation reposts are run by the seed.** Backdated stock entries queue ERPNext Repost Item
+  Valuation jobs. Demo sites keep the scheduler off, so the seed processes them at the end of each
+  stock phase. Otherwise reports would keep warning "reposting in progress". For existing sites:
+  `bench execute erpk_demo.tools.process_reposts`.
+- **User list.** Frappe lets any desk user list all non-standard users. This app adds a User
+  permission query (`erpk_demo/permissions.py`): users without System Manager see only their own User
+  record. The User list still opens for the demo user (it is their own profile), but it lists nobody
+  else.
+- **Workspace widgets.** v16 workspace blocks find number cards and charts by their row label. Custom
+  number cards also need a readable `document_type` (Bin / Stock Entry), and no currency, to show
+  for non-admins.
+- **ERPK print formats draw their own header** (company name or logo, title, draft badge) and skip the
+  standard letter head and print heading. The plain company letter head is created in the masters
+  phase, so standard formats use it too.
 
 ## Layout
 

@@ -19,6 +19,10 @@ doctype_js = {"Quotation": "public/js/quotation.js"}
 # Website: send visitors straight to login
 home_page = "login"
 
+# Demo users see only their own User record
+permission_query_conditions = {"User": "erpk_demo.permissions.user_query_conditions"}
+has_permission = {"User": "erpk_demo.permissions.user_has_permission"}
+
 after_install = "erpk_demo.install.after_install"
 
 # Only records owned by this app. Prospect data is seed, never fixtures.

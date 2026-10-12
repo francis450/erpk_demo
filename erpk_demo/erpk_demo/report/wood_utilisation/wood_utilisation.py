@@ -142,11 +142,11 @@ def columns(group_by, uom):
 	return [
 		first,
 		{"label": _("Item Produced"), "fieldname": "item_produced", "fieldtype": "Data", "width": 200},
-		{"label": _("Timber Issued ({0})").format(uom), "fieldname": "timber_issued", "fieldtype": "Float", "width": 150},
-		{"label": _("Offcuts ({0})").format(uom), "fieldname": "offcuts", "fieldtype": "Float", "width": 130},
-		{"label": _("Utilisation %"), "fieldname": "utilisation", "fieldtype": "Percent", "width": 120},
-		{"label": _("Sawdust (kg)"), "fieldname": "sawdust", "fieldtype": "Float", "width": 110},
-		{"label": _("Target %"), "fieldname": "target", "fieldtype": "Percent", "width": 90},
+		{"label": _("Timber Issued ({0})").format(uom), "fieldname": "timber_issued", "fieldtype": "Float", "precision": 1, "width": 150},
+		{"label": _("Offcuts ({0})").format(uom), "fieldname": "offcuts", "fieldtype": "Float", "precision": 1, "width": 130},
+		{"label": _("Utilisation %"), "fieldname": "utilisation", "fieldtype": "Percent", "precision": 1, "width": 120},
+		{"label": _("Sawdust (kg)"), "fieldname": "sawdust", "fieldtype": "Float", "precision": 1, "width": 110},
+		{"label": _("Target %"), "fieldname": "target", "fieldtype": "Percent", "precision": 1, "width": 90},
 		{"label": _("Variance"), "fieldname": "variance", "fieldtype": "Float", "precision": 1, "width": 90},
 	]
 
