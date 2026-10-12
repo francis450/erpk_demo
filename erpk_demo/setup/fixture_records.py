@@ -147,6 +147,7 @@ START_HERE_JS = """frappe.xcall("erpk_demo.api.start_here").then((links) => {
 		a.href = link.route;
 		a.addEventListener("click", (e) => {
 			e.preventDefault();
+			frappe.route_options = link.options || null;
 			frappe.set_route(link.route.replace(/^\\/(app|desk)\\//, ""));
 		});
 		li.appendChild(a);

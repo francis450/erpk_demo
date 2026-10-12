@@ -1,0 +1,13 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Custom HTML Block",
+  "html": "<div class=\"erpk-start\">\n\t<div class=\"erpk-start-head\">\n\t\t<span class=\"erpk-start-kicker\">Start here</span>\n\t\t<span class=\"erpk-start-sub\">Six short steps through the demo. Follow them in order.</span>\n\t</div>\n\t<ol class=\"erpk-start-list\"><li class=\"erpk-start-loading\">Loading…</li></ol>\n</div>",
+  "modified": "2026-10-12 11:04:56.758996",
+  "name": "ERPK Start Here",
+  "private": 0,
+  "roles": [],
+  "script": "frappe.xcall(\"erpk_demo.api.start_here\").then((links) => {\n\tconst list = root_element.querySelector(\".erpk-start-list\");\n\tif (!links || !links.length) {\n\t\tlist.innerHTML = \"<li class='erpk-start-loading'>Run the demo seed to fill these links.</li>\";\n\t\treturn;\n\t}\n\tlist.innerHTML = \"\";\n\tlinks.forEach((link) => {\n\t\tconst li = document.createElement(\"li\");\n\t\tconst a = document.createElement(\"a\");\n\t\ta.textContent = link.label;\n\t\ta.href = link.route;\n\t\ta.addEventListener(\"click\", (e) => {\n\t\t\te.preventDefault();\n\t\t\tfrappe.route_options = link.options || null;\n\t\t\tfrappe.set_route(link.route.replace(/^\\/(app|desk)\\//, \"\"));\n\t\t});\n\t\tli.appendChild(a);\n\t\tlist.appendChild(li);\n\t});\n});",
+  "style": ".erpk-start { border: 1px solid var(--border-color); border-left: 4px solid #006EFB;\n\tborder-radius: var(--border-radius-md); padding: 14px 18px; background: var(--card-bg); }\n.erpk-start-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-bottom: 8px; }\n.erpk-start-kicker { font-weight: 700; color: #152D5D; font-size: var(--text-lg); }\n.erpk-start-sub { color: var(--text-muted); font-size: var(--text-sm); }\n.erpk-start-list { margin: 0; padding-left: 0; list-style: none; counter-reset: step;\n\tdisplay: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 6px 18px; }\n.erpk-start-list li { counter-increment: step; display: flex; align-items: center; gap: 10px; padding: 6px 0; }\n.erpk-start-list li::before { content: counter(step); flex: none; width: 24px; height: 24px; border-radius: 50%;\n\tbackground: #152D5D; color: #fff; font-size: 12px; font-weight: 700; display: grid; place-items: center; }\n.erpk-start-list li.erpk-start-loading::before { display: none; }\n.erpk-start-list a { color: var(--text-color); font-weight: 500; }\n.erpk-start-list a:hover { color: #006EFB; text-decoration: underline; }"
+ }
+]

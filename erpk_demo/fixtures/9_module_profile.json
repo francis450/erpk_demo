@@ -1,0 +1,83 @@
+[
+ {
+  "block_modules": [
+   {
+    "module": "CRM"
+   },
+   {
+    "module": "Projects"
+   },
+   {
+    "module": "Support"
+   },
+   {
+    "module": "Quality Management"
+   },
+   {
+    "module": "Website"
+   },
+   {
+    "module": "Assets"
+   },
+   {
+    "module": "Maintenance"
+   },
+   {
+    "module": "Telephony"
+   },
+   {
+    "module": "EDI"
+   },
+   {
+    "module": "Bulk Transaction"
+   },
+   {
+    "module": "Subcontracting"
+   },
+   {
+    "module": "ERPNext Integrations"
+   },
+   {
+    "module": "Integrations"
+   },
+   {
+    "module": "Payment Gateways"
+   },
+   {
+    "module": "Payments"
+   },
+   {
+    "module": "Portal"
+   },
+   {
+    "module": "Utilities"
+   },
+   {
+    "module": "Automation"
+   },
+   {
+    "module": "Build"
+   },
+   {
+    "module": "Data"
+   },
+   {
+    "module": "Workflow"
+   },
+   {
+    "module": "Email"
+   },
+   {
+    "module": "Users"
+   },
+   {
+    "module": "System"
+   }
+  ],
+  "docstatus": 0,
+  "doctype": "Module Profile",
+  "modified": "2026-10-12 11:04:56.961077",
+  "module_profile_name": "ERPK Demo Modules",
+  "name": "ERPK Demo Modules"
+ }
+]

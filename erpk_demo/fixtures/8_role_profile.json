@@ -1,0 +1,35 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Role Profile",
+  "modified": "2026-10-12 11:04:56.946466",
+  "name": "ERPK Demo User",
+  "role_profile": "ERPK Demo User",
+  "roles": [
+   {
+    "role": "Sales User"
+   },
+   {
+    "role": "Sales Manager"
+   },
+   {
+    "role": "Stock User"
+   },
+   {
+    "role": "Stock Manager"
+   },
+   {
+    "role": "Manufacturing User"
+   },
+   {
+    "role": "Manufacturing Manager"
+   },
+   {
+    "role": "Purchase User"
+   },
+   {
+    "role": "Accounts User"
+   }
+  ]
+ }
+]

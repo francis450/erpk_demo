@@ -58,7 +58,9 @@ def _company():
 def start_here() -> list[dict]:
 	"""The workspace's numbered walkthrough links, written by the seed for the default company."""
 	links = frappe.parse_json(frappe.db.get_default(f"start_here:{_company()}", parent="__erpk_demo") or "[]")
-	return [{"label": frappe._(link["label"]), "route": link["route"]} for link in links]
+	return [
+		{"label": frappe._(link["label"]), "route": link["route"], "options": link.get("options")} for link in links
+	]
 
 
 @frappe.whitelist()
