@@ -29,8 +29,35 @@ def run(ctx):
 # ── Company & settings ──────────────────────────────────────────────────────
 
 
+def complete_setup(ctx):
+	"""A fresh site has not run the setup wizard: run it non-interactively for the company."""
+	from frappe.desk.page.setup_wizard.setup_wizard import setup_complete
+
+	year = getdate(today()).year
+	result = setup_complete(
+		{
+			"language": "English",
+			"country": "Kenya",
+			"timezone": "Africa/Nairobi",
+			"currency": "KES",
+			"company_name": ctx.company,
+			"company_abbr": ctx.abbr,
+			"chart_of_accounts": "Standard",
+			"fy_start_date": f"{year}-01-01",
+			"fy_end_date": f"{year}-12-31",
+			"setup_demo": 0,
+		}
+	)
+	if not frappe.is_setup_complete():
+		frappe.throw(f"Setup wizard did not complete: {result}")
+	ctx.count("Company", True)
+	ctx.log(f"Completed setup wizard for {ctx.company}")
+
+
 def ensure_company(ctx):
-	if frappe.db.exists("Company", ctx.company):
+	if not frappe.is_setup_complete():
+		complete_setup(ctx)
+	elif frappe.db.exists("Company", ctx.company):
 		ctx.count("Company", False)
 		existing_abbr = frappe.db.get_value("Company", ctx.company, "abbr")
 		if existing_abbr != ctx.abbr:

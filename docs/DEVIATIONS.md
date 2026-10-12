@@ -46,6 +46,9 @@ checked against the installed ERPNext/Frappe 16.50 source.
   *Business Current Account (Demo)*.
 - **Demo user email.** It is `demo@<site>`. If the site name has no dot (as for local sites like
   `tira-studio`), `.localhost` is appended so the address is valid.
+- **Fresh sites.** If the setup wizard has not run, the seed completes it non-interactively: Kenya,
+  KES, Africa/Nairobi, Standard chart, and a calendar-year fiscal year that the seed extends
+  backwards as needed. No wizard user is created.
 - **Existing company.** If the company already exists (for example from the setup wizard), the seed uses
   it and its existing abbreviation instead of the `abbr` argument.
 - **Missing ERPNext contact fields.** Some v16 sites lack ERPNext's own Address/Contact custom fields
