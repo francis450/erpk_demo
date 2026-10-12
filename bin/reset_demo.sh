@@ -39,11 +39,16 @@ echo "restoring $DB"
 bench --site "$SITE" restore "$DB" "${args[@]}"
 
 for k in "${keys[@]}"; do
-	if [[ -n "${saved[$k]}" ]]; then
-		bench --site "$SITE" set-config "$k" "${saved[$k]}" --parse 2>/dev/null \
-			|| bench --site "$SITE" set-config "$k" "${saved[$k]}"
+	v="${saved[$k]}"
+	[[ -z "$v" ]] && continue
+	if [[ "$v" =~ ^-?[0-9]+(\.[0-9]+)?$ ]]; then
+		bench --site "$SITE" set-config "$k" "$v" --parse
+	else
+		bench --site "$SITE" set-config "$k" "$v"
 	fi
 done
 bench --site "$SITE" set-config mute_emails 1 --parse
+# restore re-enables the scheduler; demo sites keep it off (DEPLOY.md §4)
+bench --site "$SITE" disable-scheduler
 bench --site "$SITE" clear-cache
 echo "== $(date -Is) reset done"
