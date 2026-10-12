@@ -44,7 +44,7 @@ def run(profile="furniture", company=None, abbr=None, demo_password=None, phases
 	ctx.print_summary()
 	from erpk_demo.seed.checks import final_checks
 
-	return final_checks(ctx)
+	return {"created": dict(ctx.created), "checks": final_checks(ctx)}
 
 
 def load_profile(name):
